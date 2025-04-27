@@ -309,14 +309,48 @@ void pressButton(int pin) {
   }
 
   if (fnPressed) {
+    // 위 화살표
     if (pin == COL2_R2_PIN) {
       Keyboard.write(KEY_UP_ARROW);
+    // 좌 화살표
     } else if (pin == COL3_R1_PIN) {
       Keyboard.write(KEY_LEFT_ARROW);
+    // 아래 화살표
     } else if (pin == COL3_R2_PIN) {
       Keyboard.write(KEY_DOWN_ARROW);
+    // 우 화살표
     } else if (pin == COL3_R3_PIN) {
       Keyboard.write(KEY_RIGHT_ARROW);
+    // 좌로 블럭지정
+    } else if (pin == COL2_R1_PIN) {
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.write(KEY_LEFT_ARROW);
+      Keyboard.release(KEY_LEFT_SHIFT);
+    // 우로 블럭지정
+    } else if (pin == COL2_R3_PIN) {
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.write(KEY_RIGHT_ARROW);
+      Keyboard.release(KEY_LEFT_SHIFT);
+    // undo
+    } else if (pin == COL4_R1_PIN) {
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('z');
+      Keyboard.release(KEY_LEFT_GUI);
+    // cut
+    } else if (pin == COL4_R2_PIN) {
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('x');
+      Keyboard.release(KEY_LEFT_GUI);
+    // pase
+    } else if (pin == COL4_R3_PIN) {
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('v');
+      Keyboard.release(KEY_LEFT_GUI);
+    // option + space
+    } else if (pin == COL5_R2_PIN) {
+      Keyboard.press(KEY_LEFT_OPTION);
+      Keyboard.write(' ');
+      Keyboard.release(KEY_LEFT_OPTION);
     }
   } else {
     switch (inputMode) {
