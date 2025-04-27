@@ -125,6 +125,19 @@ void loop() {
     setKoLang();
     firstTimeKorSettingRun = true;
   }
+  // 마지막 입력후 1초 이상 1.1초 이하면 모드에 맞는 언어 재설정
+  int lastPressedTime = millis() - lastButtonPress;
+  if (lastPressed1 != 0 && lastPressedTime > 1000 && lastPressedTime < 1100) {
+    if (inputMode == MODE_KO) {
+      setKoLang();
+    } else if (inputMode == MODE_EN) {
+      setEnLang();
+    }
+  }
+  // 1초이상 입력이 없으면 지난 입력 모두 초기화
+  if (lastPressed1 != 0 && lastPressedTime > 2000) {
+    resetAndRight();
+  }
 
   // 기본 컨트롤 키 상태 확인
   int analogValue = analogRead(ANALOG_PIN);
@@ -223,11 +236,6 @@ void loop() {
   if (inputMode == MODE_EN && col5R2State == LOW && prevCOL5_R2 == HIGH) { shiftPressed = true; }
   if (inputMode == MODE_EN && col5R2State == HIGH && prevCOL5_R2 == LOW) { shiftPressed = false; }
   if (dotState == LOW && prevDOT == HIGH) { pressButton(DOT_PIN); }
-
-  // 1초이상 입력이 없으면 지난 입력 모두 초기화
-  if (lastPressed1 != 0 && millis() - lastButtonPress > 2000) {
-    resetAndRight();
-  }
 
   // 이전 상태 저장
   prevAnalogValue = analogValue;
