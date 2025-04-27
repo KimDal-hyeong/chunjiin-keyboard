@@ -4,12 +4,12 @@
 
 // 1열과 엔터, 스페이스는 아날로그 핀의 저항값으로 컨트롤 합니다.
 #define ANALOG_PIN       A0
-#define ESC_VALUE        637  // 1열 1행
-#define TAB_VALUE        680  // 1열 2행
-#define MODE_KEY_VALUE   729  // 1열 3행 (ModeChange)
-#define BACKSPACE_VALUE  786  // 1열 4행
-#define ENTER_VALUE      852  // 2열 4행
-#define SPACE_VALUE      930  // 4열 4행
+#define ESC_VALUE        640  // 1열 1행
+#define TAB_VALUE        682  // 1열 2행
+#define MODE_KEY_VALUE   735  // 1열 3행 (ModeChange)
+#define BACKSPACE_VALUE  788  // 1열 4행
+#define ENTER_VALUE      855  // 2열 4행
+#define SPACE_VALUE      940  // 4열 4행
 
 // Column 2 keys (except Enter)
 #define COL2_R1_PIN    2  // 2열 1행
@@ -157,31 +157,43 @@ void loop() {
   if (analogValue < 10) { }
   // ESC
   else if (analogValue <= ESC_VALUE && prevAnalogValue < 10) { 
+    Serial.print("ESC: ");
+    Serial.println(analogValue);
     Keyboard.write(KEY_ESC);
     reset();
   }
   // TAB
   else if (analogValue <= TAB_VALUE && prevAnalogValue < 10) { 
+    Serial.print("TAB: ");
+    Serial.println(analogValue);
     Keyboard.write(KEY_TAB);
     reset();
   }
   // 모드 변경
   else if (analogValue <= MODE_KEY_VALUE && prevAnalogValue < 10) {
+    Serial.print("MODE: ");
+    Serial.println(analogValue);
     nextInputMode();
     reset();
   }
   // 백스페이스
   else if (analogValue <= BACKSPACE_VALUE && prevAnalogValue < 10) { 
+    Serial.print("BACKSPACE: ");
+    Serial.println(analogValue);
     Keyboard.write(KEY_BACKSPACE);
     reset();
   }
   // 엔터
   else if (analogValue <= ENTER_VALUE && prevAnalogValue < 10) {
+    Serial.print("ENTER: ");
+    Serial.println(analogValue);
     Keyboard.write(KEY_RETURN);
     reset();
   }
   // 스페이스
   else if (analogValue <= SPACE_VALUE && prevAnalogValue < 10) {
+    Serial.print("SPACE: ");
+    Serial.println(analogValue);
     Keyboard.write(' ');
     reset();
   }
