@@ -70,6 +70,7 @@ bool shiftPressed = false;
 
 // fn 모드
 bool fnPressed = false;
+bool fnUsed = false;
 
 // 처음 켜질때 한국어 셋팅을 위한 변수
 bool firstTimeKorSettingRun = false;
@@ -230,7 +231,14 @@ void loop() {
   
   // 5열 키 처리
   if (jumpState == LOW && prevJUMP == HIGH) { fnPressed = true; }
-  if (jumpState == HIGH && prevJUMP == LOW) { fnPressed = false; resetAndRight(); }
+  if (jumpState == HIGH && prevJUMP == LOW) { 
+    // fn 모드에서 사용되지 않았을때만 리셋키로 동작
+    if (!fnUsed) {
+      resetAndRight();
+    }
+    fnPressed = false; 
+    fnUsed = false;
+  }
   if (col5R2State == LOW && prevCOL5_R2 == HIGH) { pressButton(COL5_R2_PIN); }
   // 영문 모드에서는 SHIFT 키로 동작
   if (inputMode == MODE_EN && col5R2State == LOW && prevCOL5_R2 == HIGH) { shiftPressed = true; }
@@ -258,7 +266,10 @@ void loop() {
 void pressButton(int pin) {
   Serial.print("버튼 눌림! : ");
   Serial.println(pin);
-  
+
+  // fn 모드에서 버튼 눌림시 fn으로 사용됨을 체크
+  if (fnPressed) { fnUsed = true; }
+
   // .,?!
   if(pin == DOT_PIN) {
     // .
