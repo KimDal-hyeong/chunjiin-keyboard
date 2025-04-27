@@ -121,19 +121,15 @@ void setup() {
 }
 
 void loop() {
-  // 처음 시작후 3초가 지나고 한글모드라면 최초의 한글 셋팅
-  if (!firstTimeKorSettingRun && inputMode == MODE_KO && millis() > 3000) {
-    setKoLang();
+  // 처음 시작후 3초가 지나고 첫 언어 동기화
+  if (!firstTimeKorSettingRun && millis() > 3000) {
+    setLang();
     firstTimeKorSettingRun = true;
   }
   // 마지막 입력후 1초 이상 1.1초 이하면 모드에 맞는 언어 재설정
   int lastPressedTime = millis() - lastButtonPress;
   if (lastPressed1 != 0 && lastPressedTime > 1000 && lastPressedTime < 1100) {
-    if (inputMode == MODE_KO) {
-      setKoLang();
-    } else if (inputMode == MODE_EN) {
-      setEnLang();
-    }
+    setLang();
   }
   // 1초이상 입력이 없으면 지난 입력 모두 초기화
   if (lastPressed1 != 0 && lastPressedTime > 2000) {
@@ -1201,6 +1197,7 @@ void handleSpecialInput(int pin) {
 }
 
 void reset() {
+  setLang();
   lastPressed6 = 0;
   lastPressed5 = 0;
   lastPressed4 = 0;
@@ -1286,4 +1283,12 @@ void setKoLang() {
   Keyboard.press(KEY_RIGHT_GUI);
   Keyboard.write(' ');
   Keyboard.release(KEY_RIGHT_GUI);
+}
+
+void setLang() {
+  if (inputMode == MODE_KO) {
+    setKoLang();
+  } else if (inputMode == MODE_EN) {
+    setEnLang();
+  }
 }
