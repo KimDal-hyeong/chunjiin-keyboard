@@ -299,7 +299,7 @@ void pressButton(int pin) {
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('x');
       Keyboard.release(KEY_LEFT_GUI);
-    // pase
+    // paste
     } else if (pin == COL4_R3_PIN) {
       fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
@@ -317,7 +317,34 @@ void pressButton(int pin) {
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('a');
       Keyboard.release(KEY_LEFT_GUI);
+    // redo
+    } else if (pin == DOT_PIN) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.write('z');
+      Keyboard.release(KEY_LEFT_GUI);
+      Keyboard.release(KEY_LEFT_SHIFT);
+    // save
+    } else if (pin == ENTER_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('s');
+      Keyboard.release(KEY_LEFT_GUI);
+    // cmd + w
+    } else if (pin == TAB_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('w');
+      Keyboard.release(KEY_LEFT_GUI);
+    // cmd + r
+    } else if (pin == MODE_KEY_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('r');
+      Keyboard.release(KEY_LEFT_GUI);
     }
+    
 
   // fn 모드가 아닐때
   } else {
@@ -1255,7 +1282,10 @@ void resetAndRight() {
     waitingKey = 0;
   }
   reset();
-  Keyboard.write(KEY_RIGHT_ARROW);
+  // 한글모드인 경우만 우화살표로 조합형 정리
+  if(inputMode == MODE_KO) {
+    Keyboard.write(KEY_RIGHT_ARROW);
+  }
 }
 
 void setModeLED(int mode) {
