@@ -1,0 +1,506 @@
+#include "Keyboard.h";
+#include "Mouse.h";
+
+#define a 3
+#define b 2
+#define c 14
+
+#define d 5
+#define e 4
+#define f 16
+
+#define g 8
+#define h 6
+#define i 10
+
+#define j 9
+
+#define right 7
+#define special 15
+
+#define bes A0
+
+#define backspaceValue 1023
+#define enterValue 1013
+#define spaceValue 1003
+
+#define xAxis A1
+#define yAxis A2
+#define clickPin 21
+
+unsigned long lastButtonPress = 0;
+
+int lastPressed1;
+int lastPressed2;
+int lastPressed3;
+
+int waitingKey = 0;
+
+int prevA = 0;
+int prevB = 0;
+int prevC = 0;
+int prevD = 0;
+int prevE = 0;
+int prevF = 0;f
+int prevG = 0;
+int prevH = 0;
+int prevI = 0;
+int prevJ = 0;
+int prevRight = 0;
+int prevSpecial = 0;
+int prevBes = 0;
+
+int pinToFirstKey[20];
+
+int prevClickPinState = 0;
+
+unsigned long lastMaxMoveTime = 0;
+unsigned long lastScrollTime = 0;
+bool fastMode = false;
+
+int loopCount = 0;
+
+int center = 1023 / 2;
+int maxDistance = 511;
+
+void setup() {
+  Serial.begin(9600);
+
+  pinToFirstKey[a] = 'l';
+  pinToFirstKey[b] = '.';
+  pinToFirstKey[c] = 'm';
+  pinToFirstKey[d] = 'r';
+  pinToFirstKey[e] = 's';
+  pinToFirstKey[f] = 'e';
+  pinToFirstKey[g] = 'q';
+  pinToFirstKey[h] = 't';
+  pinToFirstKey[i] = 'w';
+  pinToFirstKey[j] = 'd';
+
+  // pinMode(A3, INPUT);
+  pinMode(a, INPUT_PULLUP);
+  pinMode(b, INPUT_PULLUP);
+  pinMode(c, INPUT_PULLUP);
+  pinMode(d, INPUT_PULLUP);
+  pinMode(e, INPUT_PULLUP);
+  pinMode(f, INPUT_PULLUP);
+  pinMode(g, INPUT_PULLUP);
+  pinMode(h, INPUT_PULLUP);
+  pinMode(i, INPUT_PULLUP);
+  pinMode(j, INPUT_PULLUP);
+
+  pinMode(right, INPUT_PULLUP);
+  pinMode(special, INPUT_PULLUP);
+
+  pinMode(clickPin, INPUT_PULLUP);
+
+  Mouse.begin();
+}
+
+void loop() {
+  int aState = digitalRead(a);
+  int bState = digitalRead(b);
+  int cState = digitalRead(c);
+  int dState = digitalRead(d);
+  int eState = digitalRead(e);
+  int fState = digitalRead(f);
+  int gState = digitalRead(g);
+  int hState = digitalRead(h);
+  int iState = digitalRead(i);
+  int jState = digitalRead(j);
+  int rightState = digitalRead(right);
+  int specialState = digitalRead(special);
+  int besState = analogRead(bes);
+
+  int xReading = analogRead(xAxis);
+  int yReading = analogRead(yAxis);
+
+  int mouseClickState = digitalRead(clickPin);
+
+  /*
+   * 마우스 이동
+   */
+
+  // 값에서 중심을 제해 1차 이동거리를 구합니다.
+  int xDistance = xReading - center;
+  int yDistance = yReading - center;
+
+  int xFinalDistance = 0;
+  int yFinalDistance = 0;
+
+  // 최대 이동 시도시 최대 이동 시작 시간을 기록합니다.
+  if (abs(xDistance) > maxDistance - 10 || abs(yDistance) > maxDistance - 10) {
+    if (lastMaxMoveTime == 0) {
+      lastMaxMoveTime = millis();
+
+    // 최대 이동 지속이 특정 시간을 넘었다면 fastMode를 실행합니다.
+    } else if (millis() - lastMaxMoveTime > 800) {
+      fastMode = true;
+    } 
+  } else {
+    lastMaxMoveTime = 0;
+    fastMode = false;
+  }
+
+  // 최소 이동범위를 확인하고 속도 조정을 적용합니다.
+  if (fastMode) {
+    xFinalDistance = map(xDistance, maxDistance * -1, maxDistance, -11, 11);
+  } else if (abs(xDistance) > 15) {
+    xFinalDistance = map(xDistance, maxDistance * -1, maxDistance, -2, 2);
+  }
+  if (fastMode) {
+    yFinalDistance = map(yDistance, maxDistance * -1, maxDistance, -11, 11);
+  } else if (abs(yDistance) > 15) {
+    yFinalDistance = map(yDistance, maxDistance * -1, maxDistance, -2, 2);
+  }
+
+  // x뒤집기
+  xFinalDistance = xFinalDistance * -1;
+
+  if (xFinalDistance != 0 || yFinalDistance != 0) {
+    if (rightState == LOW) {
+      if (millis() - lastScrollTime > 50) {
+        Serial.println("스크롤각");
+        Serial.print(yFinalDistance);
+        Mouse.move(0, 0, yFinalDistance > 0 ? 2 : -2);
+        lastScrollTime = millis();
+      }
+    } else {
+      Mouse.move(xFinalDistance, yFinalDistance, 0);
+    }
+  }
+
+  if (mouseClickState == LOW && prevClickPinState == HIGH) {
+    Mouse.click();
+  }
+
+  prevClickPinState = mouseClickState;
+
+  loopCount = loopCount + 1;
+
+
+  /*
+   * 천지인 키보드
+   */
+
+  if (aState == LOW && prevA == HIGH) { pressButton(a); }
+  if (bState == LOW && prevB == HIGH) { pressButton(b); }
+  if (cState == LOW && prevC == HIGH) { pressButton(c); }
+  if (dState == LOW && prevD == HIGH) { pressButton(d); }
+  if (eState == LOW && prevE == HIGH) { pressButton(e); }
+  if (fState == LOW && prevF == HIGH) { pressButton(f); }
+  if (gState == LOW && prevG == HIGH) { pressButton(g); }
+  if (hState == LOW && prevH == HIGH) { pressButton(h); }
+  if (iState == LOW && prevI == HIGH) { pressButton(i); }
+  if (jState == LOW && prevJ == HIGH) { pressButton(j); }
+  if (rightState == LOW && specialState == LOW && prevSpecial == HIGH) {
+     Keyboard.press(KEY_LEFT_GUI);
+     Keyboard.write(' ');
+     Keyboard.release(KEY_LEFT_GUI);
+  }
+  else if (rightState == LOW && prevRight == HIGH) { pressButton(right); }
+  else if (specialState == LOW && prevSpecial == HIGH) { pressButton(special); }
+
+  if (besState >= backspaceValue && prevBes < 10) { pressButton(backspaceValue); }
+  else if (besState >= enterValue && prevBes < 10) { pressButton(enterValue); }
+  else if (besState >= spaceValue && prevBes < 10) { pressButton(spaceValue); }
+
+  // 1초이상 입력이 없으면 지난 입력 모두 초기화
+  if (lastPressed1 != 0 && millis() - lastButtonPress > 2000) {
+    resetAndRight();
+  }
+
+  prevA = aState;
+  prevB = bState;
+  prevC = cState;
+  prevD = dState;
+  prevE = eState;
+  prevF = fState;
+  prevG = gState;
+  prevH = hState;
+  prevI = iState;
+  prevJ = jState;
+  prevRight = rightState;
+  prevSpecial = specialState;
+  prevBes = besState;
+
+  delay(1);
+}
+
+void pressButton(int pin) {
+  Serial.print(pin);
+  Serial.println("버튼 눌림!");
+
+  // 기다리는 키가 한번더 눌리지 않았다면 바로 먼저 입력
+  if (waitingKey != pin) {
+    Keyboard.write(pinToFirstKey[waitingKey]);
+    waitingKey = 0;
+  }
+
+  // 천지인 ㅣ
+  if(pin == a) { 
+    if (lastPressed1 == b) {
+      // ㅏ에서 ㅐ로
+      if (lastPressed2 == a) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('o');
+      
+      } else if (lastPressed2 == b) {
+        // 으점점에서 워로
+        if (lastPressed3 == c) {
+          Keyboard.write(KEY_BACKSPACE);
+          Keyboard.write('n');
+          Keyboard.write('j');
+        // 점점에서 ㅕ로
+        } else {
+          // 점은 입력하지 않으므로 지우지않음
+          Keyboard.write('u');
+        }
+      // ㅜ에서 의로
+      } else if (lastPressed2 == c) {
+        Keyboard.write('l');
+
+      // 점에서 ㅓ로
+      } else {
+        // 점은 입력하지 않으므로 지우지않음
+        Keyboard.write('j');
+      }
+    // ㅓ 에서 ㅔ로
+    } else if (lastPressed1 == a && lastPressed2 == b) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('p');
+    } else {
+      Keyboard.write('l');
+    }
+  }
+  // 천지인 점
+  else if(pin == b) { 
+    // 직전에 ㅣ를 쳣고 그전에 점을 치지않았을때 ㅏ로 (ㅓ나 ㅕ나ㅐ이후가 아님)
+    if (lastPressed1 == a && lastPressed2 != b) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('k');
+    // ㅏ에서 칠때 ㅑ로
+    } else if (lastPressed1 == b && lastPressed2 == a) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('i');
+    // 직전에 ㅡ를 쳣고 그전에 점을 치지 않았을때 ㅜ로 (ㅗ나 ㅛ이후가 아님)
+    } else if (lastPressed1 == c && lastPressed2 != b) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('n');
+    // ㅜ에서 칠때 ㅠ로
+    } else if (lastPressed1 == b && lastPressed2 == c) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('b');
+    }
+  }
+  // 천지인 ㅡ
+  else if(pin == c) {
+    if (lastPressed1 == b) {
+      // 점점에서 ㅛ로
+      if (lastPressed2 == b) {
+        // 점은 입력하지 않으므로 지우지않음
+        Keyboard.write('y');
+      // 점에서 ㅗ로
+      } else {
+        // 점은 입력하지 않으므로 지우지않음
+        Keyboard.write('h');
+      }
+    } else {
+      Keyboard.write('m'); 
+    }
+  }
+  // 천지인 ㄱㅋㄲ
+  else if(pin == d) {
+    if (lastPressed1 == d) {
+      if (lastPressed2 == d) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('r');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('z');
+      }
+    } else {
+      Keyboard.write('r');
+    } 
+  }
+  // 천지인 ㄴㄹ
+  else if(pin == e) {
+    if (lastPressed1 == e) {
+      // 세번 누르면 처음으로
+      if (lastPressed2 == e && lastPressed3 != e) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('s');
+      // ㄴ에서 ㄹ로
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('f');
+      }
+    } else {
+      Keyboard.write('s');
+    } 
+  }
+  // 천지인 ㄷㅌㄸ
+  else if(pin == f) {
+    if (waitingKey == f) {
+      Keyboard.write('x');
+      waitingKey = 0;
+    } else if (lastPressed1 == e && lastPressed2 == e) {
+      waitingKey = f;
+    } else if (lastPressed1 == f) {
+      if (lastPressed2 == f) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('e');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('x');
+      }
+    } else {
+      Keyboard.write('e');
+    } 
+  }
+  // 천지인 ㅂㅍㅃ
+  else if(pin == g) {
+    if (lastPressed1 == g) {
+      if (lastPressed2 == g) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('q');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('v');
+      }
+    } else {
+      Keyboard.write('q');
+    } 
+  }
+  // 천지인 ㅅㅎ
+  else if(pin == h) {
+    if (waitingKey == h) {
+      Keyboard.write('g');
+      waitingKey = 0;
+    } else if (lastPressed1 == e && lastPressed2 != e) {
+      waitingKey = h;
+    } else if (lastPressed1 == h) {
+      if (lastPressed2 == h) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('t');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('g');
+      }
+    } else {
+      Keyboard.write('t');
+    } 
+  }
+  // 천지인 ㅈㅊ
+  else if(pin == i) {
+    if (lastPressed1 == i) {
+      if (lastPressed2 == i) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('w');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('c');
+      }
+    } else {
+      Keyboard.write('w');
+    } 
+  }
+  // 천지인 ㅇㅁ
+  else if(pin == j) {
+    if (waitingKey == j) {
+      Keyboard.write('a');
+      waitingKey = 0;
+    } else if (lastPressed1 == e && lastPressed2 == e) {
+      waitingKey = j;
+    } else if (lastPressed1 == j) {
+      // 세번 누르면 처음으로
+      if (lastPressed2 == j && lastPressed3 != j) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('d');
+      // ㅇ에서 ㅁ로
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('a');
+      }
+    } else {
+      Keyboard.write('d');
+    } 
+  }
+  // 우측 화살표
+  else if(pin == right) {
+    resetAndRight();
+  }
+  // 특수문자
+  else if(pin == special) {
+    if (lastPressed1 == special) {
+      if (lastPressed2 == special) {
+        if (lastPressed3 == special) {
+          Keyboard.write(KEY_BACKSPACE);
+          Keyboard.press(KEY_LEFT_SHIFT);
+          Keyboard.write('1');
+          Keyboard.release(KEY_LEFT_SHIFT);
+        } else {
+          Keyboard.write(KEY_BACKSPACE);
+          Keyboard.press(KEY_LEFT_SHIFT);
+          Keyboard.write('/');
+          Keyboard.release(KEY_LEFT_SHIFT);
+        }
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write(',');
+      }
+    } else {
+      Keyboard.write('.');
+    } 
+  }
+  // 백스페이스
+  else if(pin == backspaceValue) {
+    Keyboard.write(KEY_BACKSPACE);
+  }
+  // 엔터
+  else if(pin == enterValue) {
+    Keyboard.write(KEY_RETURN);
+  }
+  // 스페이스
+  else if(pin == spaceValue) {
+    Keyboard.write(' ');
+  }
+
+  lastPressed3 = lastPressed2;
+  lastPressed2 = lastPressed1;
+  lastPressed1 = pin;
+
+  Serial.print("lastPressed1: ");
+  Serial.println(lastPressed1);
+  Serial.print("lastPressed2: ");
+  Serial.println(lastPressed2);
+  Serial.print("lastPressed3: ");
+  Serial.println(lastPressed3);
+  Serial.print("waitingKey: ");
+  Serial.println(waitingKey);
+
+  Serial.println("------");
+
+  lastButtonPress = millis();
+}
+
+void resetAndRight() {
+  if (waitingKey != 0) {
+    Keyboard.write(pinToFirstKey[waitingKey]);
+    waitingKey = 0;
+  }
+  Keyboard.write(KEY_RIGHT_ARROW);
+  lastPressed3 = 0;
+  lastPressed2 = 0;
+  lastPressed1 = 0;
+}
