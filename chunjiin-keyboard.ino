@@ -169,44 +169,37 @@ void loop() {
   else if (analogValue <= ESC_VALUE && prevAnalogValue < 10) { 
     Serial.print("ESC: ");
     Serial.println(analogValue);
-    Keyboard.write(KEY_ESC);
-    setLang();
-    reset();
+    pressButton(ESC_VALUE);
   }
   // TAB
   else if (analogValue <= TAB_VALUE && prevAnalogValue < 10) { 
     Serial.print("TAB: ");
     Serial.println(analogValue);
-    Keyboard.write(KEY_TAB);
-    reset();
+    pressButton(TAB_VALUE);
   }
   // 모드 변경
   else if (analogValue <= MODE_KEY_VALUE && prevAnalogValue < 10) {
     Serial.print("MODE: ");
     Serial.println(analogValue);
-    nextInputMode();
-    reset();
+    pressButton(MODE_KEY_VALUE);
   }
   // 백스페이스
   else if (analogValue <= BACKSPACE_VALUE && prevAnalogValue < 10) { 
     Serial.print("BACKSPACE: ");
     Serial.println(analogValue);
-    Keyboard.write(KEY_BACKSPACE);
-    reset();
+    pressButton(BACKSPACE_VALUE);
   }
   // 엔터
   else if (analogValue <= ENTER_VALUE && prevAnalogValue < 10) {
     Serial.print("ENTER: ");
     Serial.println(analogValue);
-    Keyboard.write(KEY_RETURN);
-    reset();
+    pressButton(ENTER_VALUE);
   }
   // 스페이스
   else if (analogValue <= SPACE_VALUE && prevAnalogValue < 10) {
     Serial.print("SPACE: ");
     Serial.println(analogValue);
-    Keyboard.write(' ');
-    reset();
+    pressButton(SPACE_VALUE);
   }
   
   // 기타 기본 키 처리
@@ -265,91 +258,141 @@ void pressButton(int pin) {
   Serial.println(pin);
 
   // fn 모드에서 버튼 눌림시 fn으로 사용됨을 체크
-  if (fnPressed) { fnUsed = true; }
-
-  // .,?!
-  if(pin == DOT_PIN) {
-    // .
-    if (lastPressed1 != DOT_PIN) {
-      Keyboard.write('.');
-    // . => ,
-    } else if (lastPressed2 != DOT_PIN) {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.write(',');
-    // . => , => ?
-    } else if (lastPressed3 != DOT_PIN) {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.press(KEY_LEFT_SHIFT);
-      Keyboard.write('/');
-      Keyboard.release(KEY_LEFT_SHIFT);
-    // . => , => ? => !
-    } else if (lastPressed4 != DOT_PIN) {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.press(KEY_LEFT_SHIFT);
-      Keyboard.write('1');
-      Keyboard.release(KEY_LEFT_SHIFT);
-    // . => , => ? => ! => .
-    } else if (lastPressed5 != DOT_PIN) {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.write('.');
-    // . => , => ? => ! => . => ,
-    } else if (lastPressed6 != DOT_PIN) {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.write(',');
-    // . => , => ? => ! => . => , => ?
-    } else {
-      Keyboard.write(KEY_BACKSPACE);
-      Keyboard.press(KEY_LEFT_SHIFT);
-      Keyboard.write('/');
-      Keyboard.release(KEY_LEFT_SHIFT);
-    }
-  }
-
   if (fnPressed) {
     // 위 화살표
     if (pin == COL2_R2_PIN) {
+      fnUsed = true;
       Keyboard.write(KEY_UP_ARROW);
     // 좌 화살표
     } else if (pin == COL3_R1_PIN) {
+      fnUsed = true;
       Keyboard.write(KEY_LEFT_ARROW);
     // 아래 화살표
     } else if (pin == COL3_R2_PIN) {
+      fnUsed = true;
       Keyboard.write(KEY_DOWN_ARROW);
     // 우 화살표
     } else if (pin == COL3_R3_PIN) {
+      fnUsed = true;
       Keyboard.write(KEY_RIGHT_ARROW);
     // 좌로 블럭지정
     } else if (pin == COL2_R1_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_SHIFT);
       Keyboard.write(KEY_LEFT_ARROW);
       Keyboard.release(KEY_LEFT_SHIFT);
     // 우로 블럭지정
     } else if (pin == COL2_R3_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_SHIFT);
       Keyboard.write(KEY_RIGHT_ARROW);
       Keyboard.release(KEY_LEFT_SHIFT);
     // undo
     } else if (pin == COL4_R1_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('z');
       Keyboard.release(KEY_LEFT_GUI);
     // cut
     } else if (pin == COL4_R2_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('x');
       Keyboard.release(KEY_LEFT_GUI);
     // pase
     } else if (pin == COL4_R3_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('v');
       Keyboard.release(KEY_LEFT_GUI);
     // option + space
     } else if (pin == COL5_R2_PIN) {
+      fnUsed = true;
       Keyboard.press(KEY_LEFT_ALT);
       Keyboard.write(' ');
       Keyboard.release(KEY_LEFT_ALT);
+    // select all
+    } else if (pin == ESC_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.write('a');
+      Keyboard.release(KEY_LEFT_GUI);
     }
+
+  // fn 모드가 아닐때
   } else {
+
+    // .,?!
+    if(pin == DOT_PIN) {
+      // .
+      if (lastPressed1 != DOT_PIN) {
+        Keyboard.write('.');
+      // . => ,
+      } else if (lastPressed2 != DOT_PIN) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write(',');
+      // . => , => ?
+      } else if (lastPressed3 != DOT_PIN) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('/');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      // . => , => ? => !
+      } else if (lastPressed4 != DOT_PIN) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('1');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      // . => , => ? => ! => .
+      } else if (lastPressed5 != DOT_PIN) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write('.');
+      // . => , => ? => ! => . => ,
+      } else if (lastPressed6 != DOT_PIN) {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.write(',');
+      // . => , => ? => ! => . => , => ?
+      } else {
+        Keyboard.write(KEY_BACKSPACE);
+        Keyboard.press(KEY_LEFT_SHIFT);
+        Keyboard.write('/');
+        Keyboard.release(KEY_LEFT_SHIFT);
+      }
+    }
+
+    // ESC
+    if (pin == ESC_VALUE) {
+      Keyboard.write(KEY_ESC);
+      setLang();
+      reset();
+    }
+    // TAB
+    else if (pin == TAB_VALUE) {
+      Keyboard.write(KEY_TAB);
+      reset();
+    }
+    // 모드 변경
+    else if (pin == MODE_KEY_VALUE) {
+      nextInputMode();
+      reset();
+    }
+    // 백스페이스
+    else if (pin == BACKSPACE_VALUE) {
+      Keyboard.write(KEY_BACKSPACE);
+      reset();
+    }
+    // 엔터
+    else if (pin == ENTER_VALUE) {
+      Keyboard.write(KEY_RETURN);
+      reset();
+    }
+    // 스페이스
+    else if (pin == SPACE_VALUE) {
+      Keyboard.write(' ');
+      reset();
+    }
+
+    // 모드별 처리
     switch (inputMode) {
       case MODE_KO:
         handleKoreanInput(pin);
