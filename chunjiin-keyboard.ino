@@ -170,6 +170,7 @@ void loop() {
     Serial.print("ESC: ");
     Serial.println(analogValue);
     Keyboard.write(KEY_ESC);
+    setLang();
     reset();
   }
   // TAB
@@ -1197,7 +1198,6 @@ void handleSpecialInput(int pin) {
 }
 
 void reset() {
-  setLang();
   lastPressed6 = 0;
   lastPressed5 = 0;
   lastPressed4 = 0;
@@ -1260,6 +1260,7 @@ void nextInputMode() {
 
 // Karabiner 설정에서 오른쪽 컨트롤 누르면 영문 모드로 설정
 void setEnLang() {
+  Serial.println("영어로 언어설정");
   Keyboard.write(KEY_RIGHT_CTRL);
 }
 // Karabiner 설정 JSON 예시
@@ -1279,7 +1280,9 @@ void setEnLang() {
 
 // 영문으로 설정후 언어 변경해 한국어 설정
 void setKoLang() {
-  setEnLang();
+  Serial.println("한글로 언어설정");
+  Keyboard.write(KEY_RIGHT_CTRL);
+  delay(100);
   Keyboard.press(KEY_RIGHT_GUI);
   Keyboard.write(' ');
   Keyboard.release(KEY_RIGHT_GUI);
