@@ -788,24 +788,23 @@ void handleEnglishInput(int pin) {
 }
 
 void handleNumberInput(int pin) {
-  int number = -1;
-  
   // 2열 숫자 처리 (1, 2, 3)
-  if (pin == COL2_R1_PIN) number = 1;
-  else if (pin == COL2_R2_PIN) number = 2;
-  else if (pin == COL2_R3_PIN) number = 3;
+  if (pin == COL2_R1_PIN) { Keyboard.write('1'); }
+  else if (pin == COL2_R2_PIN) { Keyboard.write('2'); }
+  else if (pin == COL2_R3_PIN) { Keyboard.write('3'); }
   // 3열 숫자 처리 (4, 5, 6)
-  else if (pin == COL3_R1_PIN) number = 4;
-  else if (pin == COL3_R2_PIN) number = 5;
-  else if (pin == COL3_R3_PIN) number = 6;
+  else if (pin == COL3_R1_PIN) { Keyboard.write('4'); }
+  else if (pin == COL3_R2_PIN) { Keyboard.write('5'); }
+  else if (pin == COL3_R3_PIN) { Keyboard.write('6'); }
   // 4열 숫자 처리 (7, 8, 9)
-  else if (pin == COL4_R1_PIN) number = 7;
-  else if (pin == COL4_R2_PIN) number = 8;
-  else if (pin == COL4_R3_PIN) number = 9;
+  else if (pin == COL4_R1_PIN) { Keyboard.write('7'); }
+  else if (pin == COL4_R2_PIN) { Keyboard.write('8'); }
+  else if (pin == COL4_R3_PIN) { Keyboard.write('9'); }
   // 5열 숫자 처리 (0)
-  else if (pin == COL5_R2_PIN) number = 0;
+  else if (pin == COL5_R2_PIN) { Keyboard.write('0'); }
 
-  Keyboard.write(number);
+  // 숫자에서 jump키를 대쉬로 사용
+  else if (pin == JUMP_PIN) { Keyboard.write('-'); }
 }
 
 void handleSpecialInput(int pin) {
