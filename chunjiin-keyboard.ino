@@ -348,9 +348,9 @@ void pressButton(int pin) {
       Keyboard.release(KEY_LEFT_GUI);
     // option + space
     } else if (pin == COL5_R2_PIN) {
-      Keyboard.press(KEY_LEFT_OPTION);
+      Keyboard.press(KEY_LEFT_ALT);
       Keyboard.write(' ');
-      Keyboard.release(KEY_LEFT_OPTION);
+      Keyboard.release(KEY_LEFT_ALT);
     }
   } else {
     switch (inputMode) {
