@@ -331,14 +331,20 @@ void pressButton(int pin) {
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('s');
       Keyboard.release(KEY_LEFT_GUI);
-    // cmd + w
+    // shift + tab
     } else if (pin == TAB_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.write(KEY_TAB);
+      Keyboard.release(KEY_LEFT_SHIFT);
+    // cmd + w
+    } else if (pin == MODE_KEY_VALUE) {
       fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('w');
       Keyboard.release(KEY_LEFT_GUI);
     // cmd + r
-    } else if (pin == MODE_KEY_VALUE) {
+    } else if (pin == BACKSPACE_VALUE) {
       fnUsed = true;
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('r');
