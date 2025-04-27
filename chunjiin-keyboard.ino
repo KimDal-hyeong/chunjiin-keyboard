@@ -1165,12 +1165,12 @@ void setModeLED(int mode) {
       digitalWrite(LED2, HIGH);
       break;
     case MODE_NUM:
-      digitalWrite(LED1, LOW);
-      digitalWrite(LED2, LOW);
-      break;
-    case MODE_SPEC:
       digitalWrite(LED1, HIGH);
       digitalWrite(LED2, HIGH);
+      break;
+    case MODE_SPEC:
+      digitalWrite(LED1, LOW);
+      digitalWrite(LED2, LOW);
       break;
   }
 }
