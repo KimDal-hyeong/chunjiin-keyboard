@@ -40,12 +40,11 @@
 #define MODE_SPEC     3   // 특수문자 모드 (11)
 
 #define MOUSE_MODE_TOUCH_PIN     A3 // 아날로그 핀에 신호에 따라 마우스 모드 전환
-#define MOUSE_MODE_TOUCH_THRESHOLD  900 // 마우스 모드 전환 임계치
-#define MOUSE_MODE_TOUCH_WINDOW_MS  300 // 마우스 모드 전환 윈도우 시간
+#define MOUSE_MODE_TOUCH_THRESHOLD  1020 // 마우스 모드 전환 임계치
+#define MOUSE_MODE_HOLD_DURATION_MS  200 // 마우스 모드 최소 유지 시간
 
-unsigned long lastMaxTime = 0; // 마지막으로 windowMax가 갱신된 시각
-int windowMax = 0; // 현재 윈도우 내 최대값
 bool mouseMode = false;
+unsigned long lastMouseModeActive = 0; // 마우스 모드 활성화 시각
 
 int inputMode = MODE_KO;
 
@@ -126,23 +125,22 @@ void setup() {
   setModeLED(inputMode);
 
   inputMode = MODE_KO;
+
+  pinMode(MOUSE_MODE_TOUCH_PIN, INPUT_PULLUP);
 }
 
 void loop() {
   unsigned long now = millis();
+  // 마우스 모드 처리
   int mouseModeValue = analogRead(MOUSE_MODE_TOUCH_PIN);
-  // 1) 새로운 값이 더 크면 최대값 갱신
-  if (mouseModeValue > windowMax) {
-    windowMax     = mouseModeValue;
-    lastMaxTime   = now;
+  // 임계치 초과 시 타이머 갱신
+  if (mouseModeValue < MOUSE_MODE_TOUCH_THRESHOLD) {
+    lastMouseModeActive = now;
   }
-  // 2) 최대값이 오래되었으면(=300ms 지난 경우) 현재 값으로 새 윈도우 시작
-  else if (now - lastMaxTime > MOUSE_MODE_TOUCH_WINDOW_MS) {
-    windowMax     = mouseModeValue;
-    lastMaxTime   = now;
-  }
-  // 3) 최대값이 임계치 이상이면 마우스 모드 전환
-  bool newMouseMode = (windowMax > MOUSE_MODE_TOUCH_THRESHOLD);
+  // 최근 일정 시간 내에 임계치 초과 기록이 마우스 모드 있으면 유지
+  bool newMouseMode = (now - lastMouseModeActive <= MOUSE_MODE_HOLD_DURATION_MS);
+
+  // 값이 0인건 무시하고, 모드가 바뀌면 업데이트
   if (newMouseMode != mouseMode) {
     mouseMode = newMouseMode;
     Serial.println(mouseModeValue);
