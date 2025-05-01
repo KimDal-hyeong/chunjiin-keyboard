@@ -990,17 +990,17 @@ void handleEnglishInput(int pin) {
 
 void handleNumberInput(int pin) {
   // 2열 숫자 처리 (1, 2, 3)
-  if (pin == COL2_R1_PIN) { Keyboard.write('1'); }
-  else if (pin == COL2_R2_PIN) { Keyboard.write('2'); }
-  else if (pin == COL2_R3_PIN) { Keyboard.write('3'); }
+  if (pin == COL2_R1_PIN) { Keyboard.write('7'); }
+  else if (pin == COL2_R2_PIN) { Keyboard.write('8'); }
+  else if (pin == COL2_R3_PIN) { Keyboard.write('9'); }
   // 3열 숫자 처리 (4, 5, 6)
   else if (pin == COL3_R1_PIN) { Keyboard.write('4'); }
   else if (pin == COL3_R2_PIN) { Keyboard.write('5'); }
   else if (pin == COL3_R3_PIN) { Keyboard.write('6'); }
   // 4열 숫자 처리 (7, 8, 9)
-  else if (pin == COL4_R1_PIN) { Keyboard.write('7'); }
-  else if (pin == COL4_R2_PIN) { Keyboard.write('8'); }
-  else if (pin == COL4_R3_PIN) { Keyboard.write('9'); }
+  else if (pin == COL4_R1_PIN) { Keyboard.write('1'); }
+  else if (pin == COL4_R2_PIN) { Keyboard.write('2'); }
+  else if (pin == COL4_R3_PIN) { Keyboard.write('3'); }
   // 5열 숫자 처리 (0)
   else if (pin == COL5_R2_PIN) { Keyboard.write('0'); }
 
