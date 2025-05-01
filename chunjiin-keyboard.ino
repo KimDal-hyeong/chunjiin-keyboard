@@ -190,18 +190,20 @@ void loop() {
 
   // 마우스 모드 처리
   if (mouseMode) {
-    if (analogValue < 10) { }
-    else if (analogValue <= ESC_VALUE && prevAnalogValue < 10) { 
-      Serial.print("좌클릭: ");
-      Serial.println(analogValue);
-      Mouse.click(MOUSE_LEFT);
+    if (analogValue < 10) { Mouse.release(MOUSE_LEFT); Mouse.release(MOUSE_RIGHT); }
+    else if (analogValue <= ESC_VALUE) { 
+      if (prevAnalogValue < 10) {
+        Serial.print("좌클릭: ");
+        Serial.println(analogValue);
+        Mouse.press(MOUSE_LEFT);
+      }
     } else if (analogValue <= TAB_VALUE) { 
       Serial.println("위로 스크롤");
       Mouse.move(0, 0, -1);
     } else if (analogValue <= MODE_KEY_VALUE && prevAnalogValue < 10) {
       Serial.print("우클릭: ");
       Serial.println(analogValue);
-      Mouse.click(MOUSE_RIGHT);
+      Mouse.press(MOUSE_RIGHT);
     }
     if (col2R2State == LOW) { 
       Serial.println("아래로 스크롤");
