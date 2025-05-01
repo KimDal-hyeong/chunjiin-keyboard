@@ -380,12 +380,12 @@ void pressButton(int pin) {
       Keyboard.write('z');
       Keyboard.release(KEY_LEFT_GUI);
       Keyboard.release(KEY_LEFT_SHIFT);
-    // save
+    // shift + enter
     } else if (pin == ENTER_VALUE) {
       fnUsed = true;
-      Keyboard.press(KEY_LEFT_GUI);
-      Keyboard.write('s');
-      Keyboard.release(KEY_LEFT_GUI);
+      Keyboard.press(KEY_LEFT_SHIFT);
+      Keyboard.write(KEY_RETURN);
+      Keyboard.release(KEY_LEFT_SHIFT);
     // shift + tab
     } else if (pin == TAB_VALUE) {
       fnUsed = true;
