@@ -1,5 +1,5 @@
 #include "Keyboard.h"
-
+#include "Mouse.h"
 // Pin definitions for Pro Micro
 
 // 1열과 엔터, 스페이스는 아날로그 핀의 저항값으로 컨트롤 합니다.
@@ -38,6 +38,14 @@
 #define MODE_EN       1   // 영문 모드 (01)
 #define MODE_NUM      2   // 숫자 모드 (00)
 #define MODE_SPEC     3   // 특수문자 모드 (11)
+
+#define MOUSE_MODE_TOUCH_PIN     A3 // 아날로그 핀에 신호에 따라 마우스 모드 전환
+#define MOUSE_MODE_TOUCH_THRESHOLD  900 // 마우스 모드 전환 임계치
+#define MOUSE_MODE_TOUCH_WINDOW_MS  300 // 마우스 모드 전환 윈도우 시간
+
+unsigned long lastMaxTime = 0; // 마지막으로 windowMax가 갱신된 시각
+int windowMax = 0; // 현재 윈도우 내 최대값
+bool mouseMode = false;
 
 int inputMode = MODE_KO;
 
@@ -121,6 +129,28 @@ void setup() {
 }
 
 void loop() {
+  unsigned long now = millis();
+  int mouseModeValue = analogRead(MOUSE_MODE_TOUCH_PIN);
+  Serial.println(mouseModeValue);
+  // 1) 새로운 값이 더 크면 최대값 갱신
+  if (mouseModeValue > windowMax) {
+    windowMax     = mouseModeValue;
+    lastMaxTime   = now;
+  }
+  // 2) 최대값이 오래되었으면(=300ms 지난 경우) 현재 값으로 새 윈도우 시작
+  else if (now - lastMaxTime > MOUSE_MODE_TOUCH_WINDOW_MS) {
+    windowMax     = mouseModeValue;
+    lastMaxTime   = now;
+  }
+  // 3) 최대값이 임계치 이상이면 마우스 모드 전환
+  bool newMouseMode = (windowMax > MOUSE_MODE_TOUCH_THRESHOLD);
+  if (newMouseMode != mouseMode) {
+    mouseMode = newMouseMode;
+    Serial.println(mouseModeValue);
+    Serial.print("마우스 모드: ");
+    Serial.println(mouseMode);
+  }
+
   // 처음 시작후 3초가 지나고 첫 언어 동기화
   if (!firstTimeKorSettingRun && millis() > 3000) {
     setLang();
@@ -159,6 +189,30 @@ void loop() {
   int col5R2State = digitalRead(COL5_R2_PIN);
   int dotState = digitalRead(DOT_PIN);
 
+  // 마우스 모드 처리
+  if (mouseMode) {
+    if (analogValue < 10) { }
+    else if (analogValue <= ESC_VALUE && prevAnalogValue < 10) { 
+      Serial.print("좌클릭: ");
+      Serial.println(analogValue);
+      Mouse.click(MOUSE_LEFT);
+    } else if (analogValue <= TAB_VALUE) { 
+      Serial.println("위로 스크롤");
+      Mouse.move(0, 0, -1);
+    } else if (analogValue <= MODE_KEY_VALUE && prevAnalogValue < 10) {
+      Serial.print("우클릭: ");
+      Serial.println(analogValue);
+      Mouse.click(MOUSE_RIGHT);
+    }
+    if (col2R2State == LOW) { 
+      Serial.println("아래로 스크롤");
+      Mouse.move(0, 0, 1);
+    }
+    prevAnalogValue = analogValue;
+    delay(50);
+    return;
+  }
+ 
   /*
    * 키보드 입력 처리
    */
@@ -349,6 +403,14 @@ void pressButton(int pin) {
       Keyboard.press(KEY_LEFT_GUI);
       Keyboard.write('r');
       Keyboard.release(KEY_LEFT_GUI);
+    // sleep
+    } else if (pin == SPACE_VALUE) {
+      fnUsed = true;
+      Keyboard.press(KEY_LEFT_GUI);
+      Keyboard.press(KEY_RIGHT_CTRL);
+      Keyboard.write('q');
+      Keyboard.release(KEY_LEFT_GUI);
+      Keyboard.release(KEY_RIGHT_CTRL);
     }
     
 
