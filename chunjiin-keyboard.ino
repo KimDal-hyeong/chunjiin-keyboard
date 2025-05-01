@@ -131,7 +131,6 @@ void setup() {
 void loop() {
   unsigned long now = millis();
   int mouseModeValue = analogRead(MOUSE_MODE_TOUCH_PIN);
-  Serial.println(mouseModeValue);
   // 1) 새로운 값이 더 크면 최대값 갱신
   if (mouseModeValue > windowMax) {
     windowMax     = mouseModeValue;
