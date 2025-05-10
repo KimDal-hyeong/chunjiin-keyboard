@@ -40,7 +40,7 @@
 #define MODE_SPEC     3   // 특수문자 모드 (11)
 
 #define MOUSE_MODE_TOUCH_PIN     A3 // 아날로그 핀에 신호에 따라 마우스 모드 전환
-#define MOUSE_MODE_TOUCH_THRESHOLD  1020 // 마우스 모드 전환 임계치
+#define MOUSE_MODE_TOUCH_THRESHOLD  1015 // 마우스 모드 전환 임계치
 #define MOUSE_MODE_HOLD_DURATION_MS  200 // 마우스 모드 최소 유지 시간
 
 bool mouseMode = false;
