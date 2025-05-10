@@ -513,6 +513,10 @@ void pressButton(int pin) {
 }
 
 void handleKoreanInput(int pin) {
+  int ei = COL2_R1_PIN;
+  int dot = COL2_R2_PIN;
+  int ue = COL2_R3_PIN;
+
   // 안 -> 않 으로 넘어갈때 ㅇ이 먼저쳐지면 안되기 때문에 해당상황을 위한 대기키
   // 기다리는 키가 한번 더 눌리지 않았다면 바로 먼저 입력
   if (waitingKey != pin) {
@@ -521,71 +525,101 @@ void handleKoreanInput(int pin) {
   }
 
   // 2열 1행 - ㅣ
-  if (pin == COL2_R1_PIN) { 
-    if (lastPressed1 == COL2_R2_PIN) {
-      // ㅏ에서 ㅐ로
-      if (lastPressed2 == COL2_R1_PIN) {
-        Keyboard.write(KEY_BACKSPACE);
-        Keyboard.write('o');
-      } else if (lastPressed2 == COL2_R2_PIN) {
-        // 으점점에서 워로
-        if (lastPressed3 == COL2_R3_PIN) {
-          Keyboard.write(KEY_BACKSPACE);
-          Keyboard.write('n');
-          Keyboard.write('j');
-        // 점점에서 ㅕ로
-        } else {
-          Keyboard.write('u');
-        }
-      // ㅜ에서 의로
-      } else if (lastPressed2 == COL2_R3_PIN) {
-        Keyboard.write('l');
-      // 점에서 ㅓ로
-      } else {
-        // 점은 입력하지 않으므로 지우지않음
-        Keyboard.write('j');
-      }
-    // ㅓ 에서 ㅔ로
-    } else if (lastPressed1 == COL2_R1_PIN && lastPressed2 == COL2_R2_PIN) {
+  if (pin == ei) {
+    // ㅡ . . ㅣ ㅣ => ㅞ
+    if (lastPressed4 == ue && lastPressed3 == dot && lastPressed2 == dot && lastPressed1 == ei) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('p');
-    } else {
+    }
+    // . ㅡ ㅣ . ㅣ => ㅙ
+    else if (lastPressed4 == dot && lastPressed3 == ue && lastPressed2 == ei && lastPressed1 == dot) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('o');
+    }
+    // ㅡ . . ㅣ => ㅝ
+    else if (lastPressed3 == ue && lastPressed2 == dot && lastPressed1 == dot) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('n');
+      Keyboard.write('j');
+    }
+    // ㅡ . ㅣ => ㅟ
+    else if (lastPressed2 == ue && lastPressed1 == dot) {
+      Keyboard.write('l');
+    }
+    // . ㅡ ㅣ => ㅚ
+    else if (lastPressed2 == dot && lastPressed1 == ue) {
+      Keyboard.write('l');
+    }
+    // . . ㅣ ㅣ => ㅖ
+    else if (lastPressed3 == dot && lastPressed2 == dot && lastPressed1 == ei) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('P');
+    }
+    // ㅣ . . ㅣ => ㅒ
+    else if (lastPressed3 == ei && lastPressed2 == dot && lastPressed1 == dot) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('O');
+    }
+    // . ㅣ ㅣ => ㅔ
+    else if (lastPressed2 == dot && lastPressed1 == ei) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('p');
+    }
+    // ㅣ . ㅣ => ㅐ
+    else if (lastPressed2 == ei && lastPressed1 == dot) {
+      Keyboard.write(KEY_BACKSPACE);
+      Keyboard.write('o');
+    }
+    // . . ㅣ => ㅕ
+    else if (lastPressed1 == dot && lastPressed2 == dot) {
+      Keyboard.write('u');
+    }
+    // . ㅣ => ㅓ
+    else if (lastPressed1 == dot) {
+      Keyboard.write('j');
+    }
+    // ㅡ ㅣ => ㅢ
+    else if (lastPressed1 == ue) {
+      Keyboard.write('l');
+    }
+    // ㅣ
+    else {
       Keyboard.write('l');
     }
   }
   // 2열 2행 - 점
-  else if (pin == COL2_R2_PIN) { 
-    // 직전에 ㅣ를 쳣고 그전에 점을 치지않았을때 ㅏ로 (ㅓ나 ㅕ나ㅐ이후가 아님)
-    if (lastPressed1 == COL2_R1_PIN && lastPressed2 != COL2_R2_PIN) {
+  else if (pin == dot) { 
+    // ㅣ . => ㅏ (그전에 점을 치지않았을때 ㅏ로 (ㅓ나 ㅕ나ㅐ이후가 아님))
+    if (lastPressed1 == ei && lastPressed2 != dot) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('k');
-    // ㅏ에서 칠때 ㅑ로
-    } else if (lastPressed1 == COL2_R2_PIN && lastPressed2 == COL2_R1_PIN) {
+    // ㅣ . . => ㅑ
+    } else if (lastPressed1 == dot && lastPressed2 == ei) {
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.write('i');
-    // 직전에 ㅡ를 쳣고 그전에 점을 치지 않았을때 ㅜ로 (ㅗ나 ㅛ이후가 아님)
-    } else if (lastPressed1 == COL2_R3_PIN && lastPressed2 != COL2_R2_PIN) {
+    // ㅡ . => ㅜ (그전에 점을 치지 않았을때 ㅜ로 (ㅗ나 ㅛ이후가 아님))
+    } else if (lastPressed1 == ue && lastPressed2 != dot) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('n');
-    // ㅜ에서 칠때 ㅠ로
-    } else if (lastPressed1 == COL2_R2_PIN && lastPressed2 == COL2_R3_PIN) {
+    // ㅡ . . => ㅠ
+    } else if (lastPressed1 == dot && lastPressed2 == ue) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('b');
     }
   }
   // 2열 3행 - ㅡ
-  else if (pin == COL2_R3_PIN) {
-    if (lastPressed1 == COL2_R2_PIN) {
-      // 점점에서 ㅛ로
-      if (lastPressed2 == COL2_R2_PIN) {
-        Keyboard.write('y');
-      // 점에서 ㅗ로
-      } else {
-        // 점은 입력하지 않으므로 지우지않음
-        Keyboard.write('h');
-      }
-    } else {
-      Keyboard.write('m'); 
+  else if (pin == ue) {
+    // . . ㅡ => ㅛ
+    if (lastPressed1 == dot && lastPressed2 == dot) {
+      Keyboard.write('y');
+    }
+    // . ㅡ => ㅗ
+    else if (lastPressed1 == dot) {
+      Keyboard.write('h');
+    }
+    // ㅡ
+    else {
+      Keyboard.write('m');
     }
   }
   // 3열 1행 - ㄱㅋㄲ
@@ -593,9 +627,7 @@ void handleKoreanInput(int pin) {
     if (lastPressed1 == COL3_R1_PIN) {
       if (lastPressed2 == COL3_R1_PIN) {
         Keyboard.write(KEY_BACKSPACE);
-        Keyboard.press(KEY_LEFT_SHIFT);
-        Keyboard.write('r');
-        Keyboard.release(KEY_LEFT_SHIFT);
+        Keyboard.write('R');
       } else {
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.write('z');
@@ -632,9 +664,7 @@ void handleKoreanInput(int pin) {
     } else if (lastPressed1 == COL3_R3_PIN) {
       if (lastPressed2 == COL3_R3_PIN) {
         Keyboard.write(KEY_BACKSPACE);
-        Keyboard.press(KEY_LEFT_SHIFT);
-        Keyboard.write('e');
-        Keyboard.release(KEY_LEFT_SHIFT);
+        Keyboard.write('E');
       } else {
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.write('x');
@@ -648,9 +678,7 @@ void handleKoreanInput(int pin) {
     if (lastPressed1 == COL4_R1_PIN) {
       if (lastPressed2 == COL4_R1_PIN) {
         Keyboard.write(KEY_BACKSPACE);
-        Keyboard.press(KEY_LEFT_SHIFT);
-        Keyboard.write('q');
-        Keyboard.release(KEY_LEFT_SHIFT);
+        Keyboard.write('Q');
       } else {
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.write('v');
@@ -672,9 +700,7 @@ void handleKoreanInput(int pin) {
       // 세번 누르면 처음으로
       if (lastPressed2 == COL4_R2_PIN) {
         Keyboard.write(KEY_BACKSPACE);
-        Keyboard.press(KEY_LEFT_SHIFT);
-        Keyboard.write('t');
-        Keyboard.release(KEY_LEFT_SHIFT);
+        Keyboard.write('T');
       // ㅇ에서 ㅁ로
       } else {
         Keyboard.write(KEY_BACKSPACE);
@@ -689,9 +715,7 @@ void handleKoreanInput(int pin) {
     if (lastPressed1 == COL4_R3_PIN) {
       if (lastPressed2 == COL4_R3_PIN) {
         Keyboard.write(KEY_BACKSPACE);
-        Keyboard.press(KEY_LEFT_SHIFT);
-        Keyboard.write('w');
-        Keyboard.release(KEY_LEFT_SHIFT);
+        Keyboard.write('W');
       } else {
         Keyboard.write(KEY_BACKSPACE);
         Keyboard.write('c');
