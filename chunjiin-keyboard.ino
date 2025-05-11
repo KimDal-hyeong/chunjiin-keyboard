@@ -791,11 +791,11 @@ void handleEnglishInput(int pin) {
     if (lastPressed1 != COL2_R2_PIN) {
       Keyboard.write('t');
     // t => y
-    } else if (lastPressed2 != COL2_R1_PIN) {
+    } else if (lastPressed2 != COL2_R2_PIN) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('y');
     // t => y => u
-    } else if (lastPressed3 != COL2_R1_PIN) {
+    } else if (lastPressed3 != COL2_R2_PIN) {
       Keyboard.write(KEY_BACKSPACE);
       Keyboard.write('u');
     // t => y => u => t
